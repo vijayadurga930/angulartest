@@ -1,0 +1,170 @@
+student-list.component.html:
+--------------------------------------------------------------
+<div class="container">
+    <h1>Students Details</h1>
+    <table class="table table-bordered">
+   <tr>
+       <th>Student Id</th>
+       <th>Name</th>
+       <th>Gender</th>
+       <th>Age</th>
+       <th>Mobile</th>
+   </tr>
+   <tr *ngFor='let student of students'>
+       <td>{{student.id}} </td>
+       <td>{{student.name}} </td>
+       <td>{{student.gender}} </td>
+       <td>{{student.age}} </td>
+       <td>{{student.mobile}} </td>
+   </tr>
+    </table>
+</div>
+
+student-list.component.ts:
+------------------------------------------------------------
+import { Component, OnInit } from '@angular/core';
+import { StudentService } from '../student.service';
+import { Student } from '../student';
+
+@Component({
+  selector: 'app-student-list',
+  templateUrl: './student-list.component.html',
+  styleUrls: ['./student-list.component.css']
+})
+export class StudentListComponent implements OnInit {
+ 
+ 
+  students:Student[];
+
+  constructor(private studentService:StudentService) { }
+
+  ngOnInit() {
+    this.studentService.getStudents().subscribe(data=>this.students=data);
+  }
+
+}
+
+
+student.ts:
+-----------------------------------------------
+export interface Student {
+  id:number;
+  name:string;
+  gender:string;
+  age:number;
+  mobile:number;
+  
+
+
+}
+
+
+app-routing.module.ts:
+-------------------------------------------------
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { StudentListComponent } from './student/student-list.component';
+import { StartpageComponent } from './student/startpage.component';
+import { AddStudentComponent } from './student/add-student.component';
+
+
+
+const routes: Routes = [
+  {path:'students',component:StudentListComponent},
+  {path:'add',component:AddStudentComponent},
+  {path:'',component:StartpageComponent}
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+
+app.component.html
+------------------------------------------------------------
+<div class="container">
+  <nav class ="navbar navbar-default">
+    <ul class="nav navbar-nav">
+    <li class="nav-item"><a class="nav-link" routerLink='/students'>List Students</a></li>
+    <li class="nav-item"><a class="nav-link" routerLink='/add'>Add Students</a> </li>
+
+    </ul>
+  </nav>
+</div>
+
+<router-outlet></router-outlet>
+
+
+app.module.ts:
+---------------------------------------------------------------
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import {HttpClientModule } from '@angular/common/http';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { StudentListComponent } from './student/student-list.component';
+import { AddStudentComponent } from './student/add-student.component';
+import { StartpageComponent } from './student/startpage.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    StudentListComponent,
+    AddStudentComponent,
+    StartpageComponent,
+    
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+
+
+
+
+student.service.ts:
+-------------------------------------------------------------
+import { Injectable, OnInit } from '@angular/core';
+import{ HttpClient } from '@angular/common/http';
+import { Student } from './student';
+import { Observable } from 'rxjs';
+@Injectable({
+  providedIn: 'root'
+})
+export class StudentService implements OnInit {
+
+  students:Student[];
+  constructor(private http:HttpClient) { }
+
+
+  ngOnInit(){
+   
+  }
+ getStudents():Observable<Student[]>{
+ return  this.http.get<Student[]>("../../assets/students.json");
+ }
+
+
+}
+
+
+student.json:
+--------------------------------------------------------------
+[
+        {"id":1001, "name": "Mark", "gender":"Male","age":23,"mobile":97979797978},
+        {"id":1002, "name": "pam", "gender":"Female","age":23,"mobile":989898989},
+        {"id":1005, "name": "Mary", "gender":"Female","age":23,"mobile":878787878},
+        {"id":1004, "name": "Ben", "gender":"Male","age":23,"mobile":6969696969},
+        {"id":1003, "name": "Sara", "gender":"Female","age":23,"mobile":7575757575}
+]
